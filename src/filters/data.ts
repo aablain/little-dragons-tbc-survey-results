@@ -297,7 +297,7 @@ export default {
       "Raiding",
       "Heroic Dungeons",
       "RP Event",
-      "PVP/Arenas",
+      "PvP/Arenas",
       "Playing the Auction House/Accumulating Gold",
       "Perpetually Leveling Alts",
       "Making/Playing \"Twinks\"",
