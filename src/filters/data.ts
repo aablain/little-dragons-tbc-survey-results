@@ -11,6 +11,34 @@ const colors = [
   "#C39BD3", // light-purple
   "#F0B27A", // light-orange
   "#7DCEA0", // light-green
+  "#B3B6B7", // light-grey
+
+  "#C0392B", // dark-red
+  "#2980B9", // dark-blue
+  "#9B59B6", // dark-purple
+  "#D35400", // dark-orange
+  "#1E8449", // Dark Green
+  // "#D4AC0D", // Lighter Dark Yellow
+  "#B7950B", // Dark Yellow
+  "#D98880", // light-red
+  "#7FB3D5", // light-blue
+  "#C39BD3", // light-purple
+  "#F0B27A", // light-orange
+  "#7DCEA0", // light-green
+  "#B3B6B7", // light-grey
+
+  "#C0392B", // dark-red
+  "#2980B9", // dark-blue
+  "#9B59B6", // dark-purple
+  "#D35400", // dark-orange
+  "#1E8449", // Dark Green
+  // "#D4AC0D", // Lighter Dark Yellow
+  "#B7950B", // Dark Yellow
+  "#D98880", // light-red
+  "#7FB3D5", // light-blue
+  "#C39BD3", // light-purple
+  "#F0B27A", // light-orange
+  "#7DCEA0", // light-green
   "#B3B6B7" // light-grey
 ];
 
@@ -23,7 +51,27 @@ const colorBlindColors = [
   "#5499C7",
   "#5DADE2",
   "#7FB3D5",
-  "#85C1E9"
+  "#85C1E9",
+  
+  "#154360",
+  "#1A5276",
+  "#1F618D",
+  "#1F618D",
+  "#2980B9",
+  "#5499C7",
+  "#5DADE2",
+  "#7FB3D5",
+  "#85C1E9",
+  
+  "#154360",
+  "#1A5276",
+  "#1F618D",
+  "#1F618D",
+  "#2980B9",
+  "#5499C7",
+  "#5DADE2",
+  "#7FB3D5",
+  "#85C1E9",
 ];
 
 const colorsObj = {
@@ -44,185 +92,228 @@ const colorsObj = {
 };
 
 const questions = [
-  "region",
-  "serverType",
-  "faction",
-  "characterGender",
-  "race",
-  "class",
-  "role",
-  "profLeveling",
-  "prof60",
-  "ageRange",
-  "hasActiveSub",
-  "firstRetailExpansionPlayed",
-  "mostRecentExpansionPlayed",
-  "hasPlayedPrivateServer",
-  "classComparison",
-  "hasFoundGuild",
-  "expectedTimeTo60",
-  "dailyPlayTime",
-  "willTakeTimeOffWork",
-  "phaseMostExcitedFor",
-  "contentInterest"
+  // "timestamp",
+    "naxx_interest",
+    "naxx_cont_class_choice",
+    "should_people_roll_different_spec",
+    "which_raids_interest",
+    "plan_to_take_break",
+    "character_name",
+    "tryhard_rating",
+    "tryhard_rating_explaination",
+    "ideal_spec_choices",
+    "ideal_prof_choices",
+    "secondary_spec_choices",
+    "loot_systems_okay_with",
+    "ideal_loot_system",
+    "raid_days_per_week_count",
+    "raid_day_time_slots",
+    "interested_in_raid_leading",
+    "content_interests",
+    "leadership_interests",
+    "tbc_guild_wants",
+    "tbc_guild_concerns"
 ];
 
+const hasOthers: { [x: string]: boolean; } = {
+  naxx_interest: false,
+  naxx_cont_class_choice: true,
+  should_people_roll_different_spec: false,
+  which_raids_interest: false,
+  plan_to_take_break: true,
+  character_name: true,
+  tryhard_rating: false,
+  tryhard_rating_explaination: true,
+  ideal_spec_choices: false,
+  ideal_prof_choices: false,
+  secondary_spec_choices: false,
+  loot_systems_okay_with: true,
+  ideal_loot_system: true,
+  raid_days_per_week_count: false,
+  raid_day_time_slots: false,
+  interested_in_raid_leading: false,
+  content_interests: false,
+  leadership_interests: true,
+  tbc_guild_wants: true,
+  tbc_guild_concerns: true
+};
+
 const titles: { [x: string]: string } = {
-  ageRange: "What is your age",
-  characterGender: "What gender will your character be",
-  class: "What class will your character be",
-  classComparison:
-    "Will you roll the same class your previous main, or try a new one",
-  contentInterest: "What content are you most excited about",
-  expectedTimeTo60:
-    "From the launch of Classic, how long do you anticipate it will take you, in real-world-time, to reach level 60",
-  faction: "What faction will your character belong to",
-  firstRetailExpansionPlayed:
-    "What is the earliest retail World of Warcraft expansion you played",
-  hasActiveSub: "Do you have an active World of Warcraft subscription",
-  hasPlayedPrivateServer:
-    "Had you played on a Vanilla WoW private server, prior to Classic's announcement",
-  mostRecentExpansionPlayed:
-    "What is the most recent retail World of Warcraft expansion you played?",
-  profLeveling:
-    "What primary professions will you be using while leveling from 1-60",
-  prof60: "What primary professions will you be using at level 60",
-  race: "What race will your character be",
-  region: "What region will you be playing on",
-  responseDate: "Response Timestamp",
-  role: "What will the primary role of your character be",
-  serverType: "What type of sever will you be playing on",
-  dailyPlayTime:
-    "After the first month (post-launch), what do you anticipate your average daily playtime will be",
-  willTakeTimeOffWork:
-    "Will you be taking time off work or other obligations for Classic's launch",
-  hasFoundGuild: "Have you already found a guild you will join at launch",
-  phaseMostExcitedFor: "Which of the six Phases are you most excited to play?"
+  // timestamp: "",
+  naxx_interest: "How interested are you in continuing to raid Naxxramas?",
+  naxx_cont_class_choice: "If at all interested in continuing to raid Naxxramas, what character setup would you want to raid as? (If different Class/Spec list which which Class/Spec combo in Other)",
+  should_people_roll_different_spec: "What is your initial reaction to the idea of People being able to change their \"Main Spec\", and in extension roll as \"Main Spec\" on items to be used in PrePatch and/or TBC? (i.e. a Resto Shaman rolling on Enhancement Gear as Main Spec in prep for TBC, etc.)",
+  which_raids_interest: "Regardless of your answer to the above 2 questions, which Raids would you be interested in running on a consistent basis during Pre-Patch gear up yourself and others new Mains for TBC?",
+  plan_to_take_break: "Do you plan on taking a break from WoW Classic before the Dark Portal opens?",
+  character_name: "Your current player name? (that we would know you by: i.e., Frugo, Colossus, Jooda, etc.)",
+  tryhard_rating: "Overall would you describe your PvE (Raiding) plans for TBC more as \"Tryhard/Focused\" or as \"Casual\"",
+  tryhard_rating_explaination: "If you wouldn't mind, please briefly explain your answer to the last question.",
+  ideal_spec_choices: "Ideally, what Specialization(s) (and in extension what class) do you want to Raid as? (Selecting multiple implies you would be equally interested in either)",
+  ideal_prof_choices: "Which Primary Professions do you intend to take on your main Raiding character (if it is your ideal class/spec)?",
+  secondary_spec_choices: "If you intend to have any other 70s you would be interested in raiding with (either in a 2nd raid group or less ideal choice for main raid), what Specialization(s) would you want to raid as?",
+  loot_systems_okay_with: "Which Loot systems are you comfortable with (select all you are comfortable with)",
+  ideal_loot_system: "Which Loot System Would you prefer most?",
+  raid_days_per_week_count: "How many days per week are you able and interested in raiding?",
+  raid_day_time_slots: "Which time slots are you available/willing to raid consistently? (times below should be interpreted as Server Time; PST/PDT)",
+  interested_in_raid_leading: "Are you interested in taking part in Raid Leading and/or helping out with Raid Organization?",
+  content_interests: "What content are you interested in",
+  leadership_interests: "If at all, what Leadership position(s) in <Little Dragons> are you interested in pursuing during TBC? (Leave blank if you are not interested in any)",
+  tbc_guild_wants: "What do you want out of the Guild in TBC?",
+  tbc_guild_concerns: "Any Concerns for the Guild in TBC? (Questions can be asked in Discord)"
 };
 
 export default {
   answers: {
-    ageRange: ["Under 18", "18 - 24", "25 - 34", "35 - 44", "44 - 55", "55+"],
-    characterGender: ["Male", "Female"],
-    class: [
-      "Shaman",
-      "Rogue",
-      "Priest",
-      "Warrior",
-      "Paladin",
-      "Mage",
-      "Warlock",
-      "Hunter",
-      "Druid"
+    timestamp: [""],
+    naxx_interest: [
+      "1",
+      "2",
+      "3"
     ],
-    classComparison: [
-      "I will be rolling the same class as my previous main",
-      "I will be rolling a class I have played extensively, but did not main",
-      "I will be rolling a new class, or one that I played minimally"
+    naxx_cont_class_choice: [
+      "Current \"Main\" (who I've been raiding Naxx with), SAME specialization",
+      "Other"
     ],
-    contentInterest: [
-      "Questing",
-      "Dungeons",
-      "World PvP",
-      "Battlegrounds",
-      "Raids",
-      "Role Playing",
-      "Collecting items/recipes/wealth",
-      "Barrens Chat"
+    should_people_roll_different_spec: [
+      "Sounds good to me!",
+      "Yes, if there are some restrictions",
+      "No, people should only get to roll Main Spec with their current Role and Spec in the raid"
     ],
-    expectedTimeTo60: [
-      "< 1 week",
-      "1 - 2 weeks",
-      "2 - 4 weeks",
-      "1 - 2 months",
-      "2 - 4 months",
-      "4 - 6 months",
-      "6+ months"
+    which_raids_interest: [
+      "Molten Core",
+      "Blackwing Lair",
+      "Zul Gurub",
+      "AQ20",
+      "AQ40",
+      "Naxxramas",
     ],
-    faction: ["For the Horde!", "For the Alliance!"],
-    firstRetailExpansionPlayed: [
-      "Vanilla",
-      "The Burning Crusade",
-      "Wrath of the Lich King",
-      "Cataclysm",
-      "Mists of Pandaria",
-      "Warlords of Draenor",
-      "Legion",
-      "Battle for Azeroth"
+    plan_to_take_break: [""],
+    character_name: [""],
+    tryhard_rating: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
     ],
-    hasActiveSub: ["Yes", "No"],
-    hasPlayedPrivateServer: ["Yes", "No"],
-    mostRecentExpansionPlayed: [
-      "Vanilla",
-      "The Burning Crusade",
-      "Wrath of the Lich King",
-      "Cataclysm",
-      "Mists of Pandaria",
-      "Warlords of Draenor",
-      "Legion",
-      "Battle for Azeroth"
+    tryhard_rating_explaination: [""],
+    ideal_spec_choices: [
+      "Protection (Warrior)",
+      "Arms/Fury",
+      "Frost",
+      "Fire",
+      "Arcane",
+      "Resto (Druid)",
+      "Feral Tank",
+      "Feral DPS",
+      "Balance",
+      "Holy (Priest)",
+      "Discipline (Priest)",
+      "Shadow",
+      "Warlock PvE DPS spec",
+      "Rogue PvE DPS spec",
+      "Resto (Shaman)",
+      "Elemental",
+      "Enhancement",
+      "Holy (Paladin)",
+      "Retribution",
+      "Protection (Paladin)",
+      "Beast Mastery",
+      "Survival",
+      "Marksman"
     ],
-    prof60: [
-      "Alchemy",
-      "Blacksmithing",
-      "Enchanting",
-      "Engineering",
-      "Herbalism",
+    ideal_prof_choices: [
+      "Tailoring",
       "Leatherworking",
-      "Mining",
-      "Skinning",
-      "Tailoring"
-    ],
-    profLeveling: [
-      "Alchemy",
       "Blacksmithing",
-      "Enchanting",
-      "Engineering",
       "Herbalism",
-      "Leatherworking",
-      "Mining",
       "Skinning",
-      "Tailoring"
+      "Mining",
+      "Engineering",
+      "Jewelcrafting",
+      "Alchemy",
+      "Enchanting"
     ],
-    race: [
-      "Human",
-      "Dwarf",
-      "Night Elf",
-      "Gnome",
-      "Orc",
-      "Undead",
-      "Tauren",
-      "Troll"
+    secondary_spec_choices: [
+      "Protection (Warrior)",
+      "Arms/Fury",
+      "Frost",
+      "Fire",
+      "Arcane",
+      "Resto (Druid)",
+      "Feral Tank",
+      "Feral DPS",
+      "Balance",
+      "Holy (Priest)",
+      "Discipline (Priest)",
+      "Shadow",
+      "Warlock PvE DPS spec",
+      "Rogue PvE DPS spec",
+      "Resto (Shaman)",
+      "Elemental",
+      "Enhancement",
+      "Holy (Paladin)",
+      "Retribution",
+      "Protection (Paladin)",
+      "Beast Mastery",
+      "Survival",
+      "Marksman"
     ],
-    region: ["Americas", "Oceanic", "Europe", "Asia"],
-    role: ["DPS", "Healer", "Tank"],
-    serverType: ["PvP", "PvE", "RP" /*"RP-PvP"*/],
-    dailyPlayTime: [
-      "1 - 2 hours",
-      "3 - 4 hours",
-      "5 - 6 hours",
-      "7 - 8 hours",
-      "9 - 10 hours",
-      "11 - 12 hours",
-      "12+ hours"
+    loot_systems_okay_with: [
+      "MS>OS (how we did it in Vanilla Classic)",
+      "Loot Council",
+      "DKP",
+      "Other"
     ],
-    willTakeTimeOffWork: [
-      "Yes, I have taken a week or more off for Classic's launch",
-      "I have no other obligations",
-      "No, I do not plan to take time off"
+    ideal_loot_system: [
+      "MS>OS (how we did it in Vanilla Classic)",
+      "Loot Council",
+      "DKP",
+      "Other"
     ],
-    hasFoundGuild: [
+    raid_days_per_week_count: [
+      "1",
+      "2",
+      "3+"
+    ],
+    raid_day_time_slots: [
+      "Monday (evening)",
+      "Tuesday (evening)",
+      "Wednesday (evening)",
+      "Thursdayday (evening)",
+      "Friday (evening)",
+      "Saturday (morning)",
+      "Saturday (afternoon)",
+      "Saturday (evening)",
+      "Sunday (morning)",
+      "Sunday (afternoon)",
+      "Sunday (evening)",
+    ],
+    interested_in_raid_leading: [
       "Yes",
-      "No, and I am not currently looking",
-      "No, though I am currently looking"
+      "No",
     ],
-    phaseMostExcitedFor: [
-      "Phase 1",
-      "Phase 2",
-      "Phase 3",
-      "Phase 4",
-      "Phase 5",
-      "Phase 6"
+    content_interests: [
+      "Raiding",
+      "Heroic Dungeons",
+      "RP Event",
+      "PVP/Arenas",
+      "Playing the Auction House/Accumulating Gold",
+      "Perpetually Leveling Alts",
+      "Making/Playing \"Twinks\"",
+      "[ Unofficial ] Achievement Hunting",
+    ],
+    leadership_interests: [
+      "Officer",
+      "Class Leader",
+      "Loot Council (If such exists)",
+      "Other"
+    ],
+    tbc_guild_wants: [
+      ""
+    ],
+    tbc_guild_concerns: [
+      ""
     ]
   },
   colors,
@@ -252,6 +343,7 @@ export default {
       Druid: true
     }
   },
+  hasOthers,
   questions,
   factionRaces: {
     ["For the Horde!"]: {

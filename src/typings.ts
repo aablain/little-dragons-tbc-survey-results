@@ -113,12 +113,34 @@ export namespace Survey {
     region: RegionResp;
     role: RoleResp;
     serverType: ServerTypeResp;
-    dailyPlayTime: DailyPlayTimeResp,
-    willTakeTimeOffWork: TimeOffWorkResp,
-    hasFoundGuild: GuildResp,
-    phaseMostExcitedFor: PhaseResp
+    dailyPlayTime: DailyPlayTimeResp;
+    willTakeTimeOffWork: TimeOffWorkResp;
+    hasFoundGuild: GuildResp;
+    phaseMostExcitedFor: PhaseResp;
   }
 }
+
+// "timestamp",
+//     "naxx_interest",
+//     "naxx_cont_class_choice",
+//     "should_people_roll_different_spec",
+//     "which_raids_interest",
+//     "plan_to_take_break",
+//     "character_name",
+//     "tryhard_rating",
+//     "tryhard_rating_explaination",
+//     "ideal_spec_choices",
+//     "ideal_prof_choices",
+//     "secondary_spec_choices",
+//     "loot_systems_okay_with",
+//     "ideal_loot_system",
+//     "raid_days_per_week_count",
+//     "raid_day_time_slots",
+//     "interested_in_raid_leading",
+//     "content_interests",
+//     "leadership_interests",
+//     "tbc_guild_wants",
+//     "tbc_guild_concerns"
 
 export namespace FilterTypes {
   export interface SelectedAnswers {
@@ -175,16 +197,25 @@ export namespace FilterTypes {
     };
     dailyPlayTime: {
       [x: string]: boolean;
-    },
+    };
     willTakeTimeOffWork: {
       [x: string]: boolean;
-    },
+    };
     hasFoundGuild: {
       [x: string]: boolean;
-    },
+    };
     phaseMostExcitedFor: {
       [x: string]: boolean;
-    }
+    };
+    leadership_interests: {
+      [x: string]: boolean;
+    };
+    tbc_guild_wants: {
+      [x: string]: boolean;
+    };
+    tbc_guild_concerns: {
+      [x: string]: boolean;
+    };
   }
 
   export interface AnswersCounts {
@@ -251,6 +282,15 @@ export namespace FilterTypes {
     phaseMostExcitedFor: {
       [x: string]: number;
     }
+    leadership_interests: {
+      [x: string]: number;
+    }
+    tbc_guild_wants: {
+      [x: string]: number;
+    }
+    tbc_guild_concerns: {
+      [x: string]: number;
+    }
   }
 
   export interface QuestionsShowing {
@@ -271,9 +311,12 @@ export namespace FilterTypes {
     region: boolean;
     role: boolean;
     serverType: boolean;
-    dailyPlayTime: boolean,
-    willTakeTimeOffWork: boolean,
-    hasFoundGuild: boolean,
-    phaseMostExcitedFor: boolean
+    dailyPlayTime: boolean;
+    willTakeTimeOffWork: boolean;
+    hasFoundGuild: boolean;
+    phaseMostExcitedFor: boolean;
+    leadership_interests: boolean;
+    tbc_guild_wants: boolean;
+    tbc_guild_concerns: boolean;
   }
 }

@@ -15,10 +15,25 @@ export default class BarGraph extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
 
+    this._getLargestNumber = this._getLargestNumber.bind(this)
     this.getAnswerWidth = this.getAnswerWidth.bind(this);
   }
 
+  _getLargestNumber(): number {
+    if (!this.props.answers) {
+      return this.props.totalAnswers;
+    }
+
+    const largestNumber = this.props.answers.reduce((curLargestNumber: number, answer) => {
+      return curLargestNumber >= answer.value ? curLargestNumber : answer.value;
+    }, 0);
+
+    return largestNumber + 2 > this.props.totalAnswers ? this.props.totalAnswers : largestNumber + 2;
+  }
+
   public render() {
+    const topEndNumber = this._getLargestNumber();
+
     return (
       <div className="bar-graph">
         {this.props.answers &&
@@ -27,12 +42,12 @@ export default class BarGraph extends React.Component<Props> {
               !!answer.value && (
                 <p
                   className="answer-bar"
-                  data-content={`${answer.title}: ${
+                  data-content={`${answer.title || "(No Answer)"}: ${
                     answer.value
-                  } (${this.getAnswerWidth(answer)}%)`}
+                  } (${this.getAnswerWidth(answer, topEndNumber)}%)`}
                   key={answer.title}
                   style={{
-                    width: `${this.getAnswerWidth(answer)}%`,
+                    width: `${this.getAnswerWidth(answer, topEndNumber)}%`,
                     backgroundColor: answer.color
                   }}
                 />
@@ -40,13 +55,13 @@ export default class BarGraph extends React.Component<Props> {
           )}
         <p className="bar-graph-range">
           <span>0</span>
-          <span>{this.props.totalAnswers}</span>
+          <span>{topEndNumber}</span>
         </p>
       </div>
     );
   }
 
-  getAnswerWidth(answer: { color: string; title: string; value: number }) {
-    return ((answer.value / this.props.totalAnswers) * 100).toFixed(2);
+  getAnswerWidth(answer: { color: string; title: string; value: number }, topEndNumber: number) {
+    return ((answer.value / topEndNumber) * 100).toFixed(2);
   }
 }

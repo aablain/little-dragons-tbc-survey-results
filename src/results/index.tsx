@@ -2,6 +2,7 @@ import * as React from "react";
 import Data from "../filters/data";
 import Result from "./result";
 import { FilterTypes, Survey } from "../typings";
+import { objectEntries } from "../utils";
 
 import "./styles.scss";
 import data from "../filters/data";
@@ -19,6 +20,7 @@ interface Props {
 
 export default (props: Props) => {
   const filtersLength = !!props.activeFilters ? props.activeFilters.length : 0;
+  const characterNames = objectEntries((props.answerCounts as any).character_name).filter(([name, count]) => !!count).map(([name]) => name);
 
   return (
     <div className="results-main-cont" style={{ height: props.innerHeight }}>
@@ -78,6 +80,13 @@ export default (props: Props) => {
           )
         )}
 
+        <section className="results-results-people-list-cont">
+          <ul className="results-results-people-list">
+            {characterNames.map(personName => (
+              <li className="results-results-people-list-name" key={`peoplelist-${personName}`}>{personName}</li>
+            ))}
+          </ul>
+        </section>
       </div>
     </div>
   );

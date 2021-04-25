@@ -8,9 +8,20 @@ import { getSurveyData, objectEntries } from "./utils";
 interface Props {}
 
 interface State {
-  activeFilters?: [keyof Survey.Response, Survey.AllAnswers[]][];
-  answerCounts: FilterTypes.AnswersCounts;
-  answers: FilterTypes.SelectedAnswers;
+  // activeFilters?: [keyof Survey.Response, Survey.AllAnswers[]][];
+  // answerCounts: FilterTypes.AnswersCounts;
+  // answers: FilterTypes.SelectedAnswers;
+  activeFilters?: [string, string[]][];
+  answerCounts: {
+    [x: string]: {
+      [x: string]: number;
+    };
+  };
+  answers: {
+    [x: string]: {
+      [x: string]: boolean;
+    };
+  };
   computedResponsesLength: number;
   failedToLoad?: boolean;
   filtering: boolean;
@@ -18,10 +29,55 @@ interface State {
   isMobile: boolean;
   isColorBlind: boolean;
   loaded: boolean;
-  questionsShowing: FilterTypes.QuestionsShowing;
-  responses: Survey.Response[];
+  // questionsShowing: FilterTypes.QuestionsShowing;
+  questionsShowing: {
+    [x: string]: boolean;
+  };
+  responses: {
+    [x: string]: string | number;
+  }[];
   showFilters: boolean;
 }
+
+const QUESTIONS_KEYS = [
+  // "timestamp",
+    "naxx_interest",
+    "naxx_cont_class_choice",
+    "should_people_roll_different_spec",
+    "which_raids_interest",
+    "plan_to_take_break",
+    "character_name",
+    "tryhard_rating",
+    "tryhard_rating_explaination",
+    "ideal_spec_choices",
+    "ideal_prof_choices",
+    "secondary_spec_choices",
+    "loot_systems_okay_with",
+    "ideal_loot_system",
+    "raid_days_per_week_count",
+    "raid_day_time_slots",
+    "interested_in_raid_leading",
+    "content_interests",
+    "leadership_interests",
+    "tbc_guild_wants",
+    "tbc_guild_concerns"
+];
+
+const answersBlank = QUESTIONS_KEYS.reduce((accum: { [x: string]: Object; }, key) => {
+  accum[key] = {};
+
+  return accum;
+}, {});
+
+const defaultShowingQuestions = QUESTIONS_KEYS.reduce((accum: { [x: string]: boolean; }, key) => {
+  accum[key] = true;
+
+  if (key === "timestamp" || key === "plan_to_take_break" || key === "character_name" || key === "tryhard_rating_explaination" || key === "tbc_guild_wants" || key === "tbc_guild_concerns") {
+    accum[key] = false;
+  }
+
+  return accum;
+}, {})
 
 export default class Wrapper extends React.Component<Props, State> {
   public displayName = "Wrapper";
@@ -31,29 +87,9 @@ export default class Wrapper extends React.Component<Props, State> {
 
     this.state = {
       answers: {
-        ageRange: {},
-        characterGender: {},
-        class: {},
-        classComparison: {},
-        contentInterest: {},
-        expectedTimeTo60: {},
-        faction: {},
-        firstRetailExpansionPlayed: {},
-        hasActiveSub: {},
-        hasPlayedPrivateServer: {},
-        mostRecentExpansionPlayed: {},
-        prof60: {},
-        profLeveling: {},
-        race: {},
-        region: {},
-        role: {},
-        serverType: {},
-        dailyPlayTime: {},
-        willTakeTimeOffWork: {},
-        hasFoundGuild: {},
-        phaseMostExcitedFor: {}
-      },
-      answerCounts: this._calcAnswerQuantities([]),
+        ...answersBlank
+      } as any,
+      answerCounts: this._calcAnswerQuantities([]) as any,
       computedResponsesLength: 0,
       filtering: false,
       innerHeight: window.innerHeight,
@@ -61,27 +97,7 @@ export default class Wrapper extends React.Component<Props, State> {
       isColorBlind: false,
       loaded: false,
       questionsShowing: {
-        ageRange: true,
-        characterGender: true,
-        class: true,
-        classComparison: true,
-        contentInterest: true,
-        expectedTimeTo60: true,
-        faction: true,
-        firstRetailExpansionPlayed: true,
-        hasActiveSub: true,
-        hasPlayedPrivateServer: true,
-        mostRecentExpansionPlayed: true,
-        prof60: true,
-        profLeveling: true,
-        race: true,
-        region: true,
-        dailyPlayTime: true,
-        willTakeTimeOffWork: true,
-        hasFoundGuild: true,
-        role: true,
-        serverType: true,
-        phaseMostExcitedFor: true
+        ...defaultShowingQuestions
       },
       responses: [],
       showFilters: window.innerWidth > 480
@@ -89,6 +105,7 @@ export default class Wrapper extends React.Component<Props, State> {
 
     this._calcAnswerQuantities = this._calcAnswerQuantities.bind(this);
     this._filterResults = this._filterResults.bind(this);
+    this._isOtherAnswer = this._isOtherAnswer.bind(this)
     this._getAnswersTemplate = this._getAnswersTemplate.bind(this);
     this.applyFilter = this.applyFilter.bind(this);
     this.clearFilter = this.clearFilter.bind(this);
@@ -100,20 +117,37 @@ export default class Wrapper extends React.Component<Props, State> {
 
   _calcAnswerQuantities(responses: Survey.Response[]) {
     const answerCounts = responses.reduce((accum, response) => {
+      // debugger;
       const respAsArray = objectEntries(response);
 
-      respAsArray.forEach(([questionKey, answer]: string[]) => {
-        if (questionKey === "responseDate") {
+      respAsArray.forEach(([questionKey, ans]: string[]) => {
+        if (questionKey === "timestamp") {
           return accum;
         }
+
+        const answer = `${ans}`;
+
         if (
-          questionKey === "prof60" ||
-          questionKey === "profLeveling" ||
-          questionKey === "contentInterest"
+          questionKey === "which_raids_interest" ||
+          questionKey === "ideal_prof_choices" ||
+          questionKey === "ideal_spec_choices" ||
+          questionKey === "secondary_spec_choices" ||
+          questionKey === "loot_systems_okay_with" ||
+          questionKey === "raid_day_time_slots" ||
+          questionKey === "content_interests" ||
+          questionKey === "leadership_interests"
         ) {
-          const subAnswers = answer.split(", ");
+          const subAnswers = answer.split(";");
 
           subAnswers.forEach(subAnswer => {
+            if (Data.hasOthers[questionKey] && subAnswer && subAnswer !== "Other" && this._isOtherAnswer(questionKey, subAnswer)) {
+              if (!(accum as any)[questionKey]["Other"]) {
+                (accum as any)[questionKey]["Other"] = 1;
+              } else {
+                (accum as any)[questionKey]["Other"]++;
+              }
+            }
+
             if (!accum[questionKey as keyof Survey.Response][subAnswer]) {
               accum[questionKey as keyof Survey.Response][subAnswer] = 1;
             } else {
@@ -121,6 +155,14 @@ export default class Wrapper extends React.Component<Props, State> {
             }
           });
         } else {
+          if (Data.hasOthers[questionKey] && answer && answer !== "Other" && this._isOtherAnswer(questionKey, answer)) {
+            if (!(accum as any)[questionKey]["Other"]) {
+              (accum as any)[questionKey]["Other"] = 1;
+            } else {
+              (accum as any)[questionKey]["Other"]++;
+            }
+          }
+
           if (!accum[questionKey as keyof Survey.Response][answer]) {
             accum[questionKey as keyof Survey.Response][answer] = 1;
           } else {
@@ -166,16 +208,27 @@ export default class Wrapper extends React.Component<Props, State> {
         return;
       }
 
-      const filteredResps = this._filterResults(responses);
+      // debugger;
 
-      const answerCounts = this._calcAnswerQuantities(filteredResps);
+      // const filteredResps = this._filterResults(responses);
+      const filteredResps = responses;
+
+      const answerCounts: any = this._calcAnswerQuantities(filteredResps);
       this.setState({
         answerCounts,
         computedResponsesLength: filteredResps.length,
-        responses: filteredResps,
+        responses: filteredResps as any,
         loaded: true
       });
     });
+  }
+
+  _isOtherAnswer(question: string, answer: string) {
+    if (!Data.hasOthers[question]) {
+      return false;
+    }
+
+    return (Data.answers as { [x: string]: string[] })[question] && !(Data.answers as { [x: string]: string[] })[question].find(ans => ans === answer);
   }
 
   _setHeight() {
@@ -239,9 +292,9 @@ export default class Wrapper extends React.Component<Props, State> {
             clearFilter={this.clearFilter}
             innerHeight={this.state.innerHeight}
             isColorBlind={this.state.isColorBlind}
-            questionsShowing={this.state.questionsShowing}
+            questionsShowing={this.state.questionsShowing as any}
             resetQuestionsShowing={this.resetQuestionsShowing}
-            selectedAnswers={this.state.answers}
+            selectedAnswers={this.state.answers as any}
             toggleAnswer={this.toggleAnswerFilter}
             updateColorBlind={() =>
               this.setState({ isColorBlind: !this.state.isColorBlind })
@@ -252,13 +305,13 @@ export default class Wrapper extends React.Component<Props, State> {
 
         {this.state.answerCounts && (
           <Results
-            answerCounts={this.state.answerCounts}
-            activeFilters={this.state.activeFilters}
+            answerCounts={this.state.answerCounts as any}
+            activeFilters={this.state.activeFilters as any}
             computedResponsesLength={this.state.computedResponsesLength}
             allResponsesCount={this.state.responses.length}
             innerHeight={this.state.innerHeight}
             isColorBlind={this.state.isColorBlind}
-            questionsShowing={this.state.questionsShowing}
+            questionsShowing={this.state.questionsShowing as any}
             updateFilterLive={this.updateFilterLive}
           />
         )}
@@ -269,24 +322,26 @@ export default class Wrapper extends React.Component<Props, State> {
   applyFilter() {
     this.setState({ filtering: true }, () => {
       const { answers } = this.state;
-      const questionsWithFilters = this.getFilters(answers);
+
+      debugger;
+      const questionsWithFilters = this.getFilters(answers as any);
 
       if (!questionsWithFilters.length) {
         return this.setState({
           activeFilters: [],
           filtering: false,
           answerCounts: this._calcAnswerQuantities(this.state
-            .responses as Survey.Response[]),
-          computedResponsesLength: (this.state.responses as Survey.Response[])
+            .responses as any[]) as any,
+          computedResponsesLength: (this.state.responses as any[])
             .length
         });
       }
 
       const computedResponses = this.getFilteredResponses(
-        (this.state.responses as Survey.Response[]) || [],
+        (this.state.responses as any[]) || [],
         questionsWithFilters
       );
-      const answerCounts = this._calcAnswerQuantities(computedResponses);
+      const answerCounts: any = this._calcAnswerQuantities(computedResponses);
 
       this.setState({
         activeFilters: questionsWithFilters,
@@ -355,12 +410,25 @@ export default class Wrapper extends React.Component<Props, State> {
       return filters.every(([questionKey, selectedAnswers]) => {
         return (selectedAnswers as string[]).some(selectedAnswer => {
           if (
-            questionKey === "contentInterest" ||
-            questionKey === "prof60" ||
-            questionKey === "profLeveling"
+            (questionKey as string) === "which_raids_interest" ||
+            (questionKey as string) === "ideal_spec_choices" ||
+          (questionKey as string) === "ideal_prof_choices" ||
+          (questionKey as string) === "secondary_spec_choices" ||
+          (questionKey as string) === "loot_systems_okay_with" ||
+          (questionKey as string) === "raid_day_time_slots" ||
+          (questionKey as string) === "content_interests" ||
+          (questionKey as string) === "leadership_interests"
           ) {
             // @ts-ignore
             return response[questionKey].includes(selectedAnswer);
+          } else if ((questionKey as string) === "naxx_interest" || (questionKey as string) === "tryhard_rating" || (questionKey as string) === "raid_days_per_week_count") {
+            if ((questionKey as string) === "naxx_interest") {
+              if (selectedAnswer === "3") {
+                return (response[questionKey] as any as number) >= 3;
+              }
+            }
+
+            return `${response[questionKey]}` === selectedAnswer
           }
 
           return response[questionKey] === selectedAnswer;

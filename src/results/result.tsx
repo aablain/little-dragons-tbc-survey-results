@@ -21,7 +21,13 @@ interface State {
     value: number;
     color: string;
   }[];
+  otherCounts: {
+    title: string;
+    value: number;
+    color: string;
+  }[];
   countsArr?: [string, number][];
+  showOtherAnswers: boolean;
 }
 
 export default class Result extends React.Component<Props, State> {
@@ -30,11 +36,18 @@ export default class Result extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
+    const [counts, otherCounts] = this._pullOtherAnswersOut(props.answerCounts);
+
     this.state = {
-      counts: this._getCountsAsArray(props.answerCounts)
+      // counts: this._getCountsAsArray(props.answerCounts),
+      counts,
+      otherCounts,
+      showOtherAnswers: false,
       //   countsArr: this._getCountsAssARrayofArrays(props.answerCounts)
     };
 
+    this._isOtherAnswer = this._isOtherAnswer.bind(this)
+    this._pullOtherAnswersOut = this._pullOtherAnswersOut.bind(this)
     this.getColor = this.getColor.bind(this);
     this.getChartType = this.getChartType.bind(this);
     this.renderBarGraph = this.renderBarGraph.bind(this);
@@ -57,25 +70,83 @@ export default class Result extends React.Component<Props, State> {
     );
   }
 
+  _isOtherAnswer(question: string, answer: string) {
+    if (!Data.hasOthers[question]) {
+      return false;
+    }
+
+    return (Data.answers as { [x: string]: string[] })[question] && !(Data.answers as { [x: string]: string[] })[question].find(ans => ans === answer);
+  }
+
+  _pullOtherAnswersOut(answerCounts: {
+    [x: string]: number;
+  }) {
+    if (!Data.hasOthers[this.props.question as any]) {
+      return [
+        this._getCountsAsArray(answerCounts),
+        []
+      ];
+    }
+
+    const [answers, otherAnswers] = (objectEntries(answerCounts) as [string, number][]).reduce(
+      ([answrs, othAnswrs]: any[][], [key, value], idx) => {
+        if (this._isOtherAnswer(this.props.question, key)) {
+          othAnswrs.push({
+            title: key,
+            value,
+            color: this.getColor(othAnswrs.length, key)
+          } as any);
+        } else {
+          answrs.push({
+            title: key,
+            value,
+            color: this.getColor(answrs.length, key)
+          } as any);
+        }
+      //   return {
+      //   title: key,
+      //   value,
+      //   color: this.getColor(idx, key)
+      // }
+
+      return [answrs, othAnswrs];
+    }, [[], []] as any[][]
+    );
+
+    return [answers, otherAnswers];
+  }
+
   componentDidUpdate(prevProps: Props) {
     if (
       this.props.answerCounts !== prevProps.answerCounts ||
       this.props.isColorBlind !== prevProps.isColorBlind
     ) {
+      const [counts, otherCounts] = this._pullOtherAnswersOut(this.props.answerCounts);
+
       this.setState({
-        counts: this._getCountsAsArray(this.props.answerCounts)
+        // counts: this._getCountsAsArray(this.props.answerCounts)
+        counts,
+        otherCounts
       });
     }
   }
 
   public render() {
+    const hasOtherAnswers = Data.hasOthers[this.props.question as any];
+
     return (
-      <div className="result-cont" id={this.props.question}>
+      <div className={`result-cont ${!this.props.totalAnswers && "no-answers"}`} id={this.props.question}>
         <h4 className="result-title">{Data.titles[this.props.question]}?</h4>
         <div className="info-cont">
-          {this.getChartType() === "BarChart"
-            ? this.renderBarGraph()
-            : this.renderPieChart()}
+          {this.props.totalAnswers ? (
+            this.getChartType() === "BarChart"
+              ? this.renderBarGraph()
+              : this.renderPieChart()
+          ) : (
+            <div>
+              <h3>No Answers</h3>
+            </div>
+          )}
 
           <ul className="stats-list-cont">
             {!!this.state.counts.length &&
@@ -104,6 +175,47 @@ export default class Result extends React.Component<Props, State> {
                 </li>
               ))}
           </ul>
+
+          {hasOtherAnswers && <div>
+            <button className="result-showother-button" onClick={() => this.setState({ showOtherAnswers: !this.state.showOtherAnswers })}>Show "Other" Answers</button>
+          </div>}
+
+          {this.state.showOtherAnswers && (
+            <>
+              {!!this.state.otherCounts.length ? (
+                 <ul className="stats-list-cont">
+                 {this.state.otherCounts.map(({ color, title, value }) => (
+                     <li
+                       className={`result-text${!value ? " none-match" : ""}`}
+                       key={title}
+                       style={{
+                         color
+                         // textDecoration: !value ? "line-through" : ""
+                       }}
+                     >
+                       <span className="result-text-title">{title || "(No Answer)"}:</span>{" "}
+                       <span className="result-text-value">
+                         {value} -{" "}
+                         <span
+                           className="result-text-value-percentage"
+                           style={{
+                             borderColor: color
+                             // backgroundColor: color
+                           }}
+                         >
+                           {((value / this.props.totalAnswers) * 100).toFixed(2)}%
+                         </span>
+                       </span>
+                     </li>
+                   ))}
+               </ul>
+              ) : (
+                <div>
+                  <h3>No Answers Fit This Description passing the filter</h3>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     );
@@ -120,10 +232,34 @@ export default class Result extends React.Component<Props, State> {
   }
 
   getChartType(): "PieChart" | "BarChart" {
-    switch (this.props.question) {
-      case "prof60":
-      case "profLeveling":
-      case "contentInterest":
+    // "naxx_interest",
+    // "naxx_cont_class_choice",
+    // "should_people_roll_different_spec",
+    // "which_raids_interest",
+    // "plan_to_take_break",
+    // "character_name",
+    // "tryhard_rating",
+    // "tryhard_rating_explaination",
+    // "ideal_spec_choices",
+    // "ideal_prof_choices",
+    // "secondary_spec_choices",
+    // "loot_systems_okay_with",
+    // "ideal_loot_system",
+    // "raid_days_per_week_count",
+    // "raid_day_time_slots",
+    // "interested_in_raid_leading",
+    // "content_interests",
+    // "leadership_interests",
+    // "tbc_guild_wants",
+    // "tbc_guild_concerns"
+    switch (this.props.question as string) {
+      case "which_raids_interest":
+      case "ideal_spec_choices":
+      case "ideal_prof_choices":
+      case "secondary_spec_choices":
+      case "loot_systems_okay_with":
+      case "raid_day_time_slots":
+      case "leadership_interests":
         return "BarChart";
       default:
         return "PieChart";
