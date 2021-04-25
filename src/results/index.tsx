@@ -30,7 +30,7 @@ export default (props: Props) => {
   const [surveyResponse, updateSurveyResponse] = React.useState<any>(undefined);
 
   const filtersLength = !!props.activeFilters ? props.activeFilters.length : 0;
-  const characterNames = objectEntries((props.answerCounts as any).character_name).filter(([name, count]) => !!count).map(([name]) => name);
+  const characterNames = objectEntries((props.answerCounts as any).character_name).filter(([name, count]) => !!count && !!name && name !== "Other").map(([name]) => name);
 
   return (
     <div className="results-main-cont" style={{ height: props.innerHeight }}>
@@ -92,7 +92,7 @@ export default (props: Props) => {
 
         <section className="results-results-people-list-cont">
           <ul className="results-results-people-list">
-            {characterNames.map(personName => (
+            {characterNames.map(personName =>  (
               <li className="results-results-people-list-name" key={`peoplelist-${personName}`}>
                 <button className="results-results-people-list-name-btn" onClick={() => {
                   const response = props.responsesByPersonName[personName];

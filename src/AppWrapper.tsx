@@ -338,7 +338,6 @@ export default class Wrapper extends React.Component<Props, State> {
     this.setState({ filtering: true }, () => {
       const { answers } = this.state;
 
-      debugger;
       const questionsWithFilters = this.getFilters(answers as any);
 
       if (!questionsWithFilters.length) {
@@ -370,27 +369,7 @@ export default class Wrapper extends React.Component<Props, State> {
   clearFilter() {
     this.setState({
       answers: {
-        ageRange: {},
-        characterGender: {},
-        class: {},
-        classComparison: {},
-        contentInterest: {},
-        expectedTimeTo60: {},
-        faction: {},
-        firstRetailExpansionPlayed: {},
-        hasActiveSub: {},
-        hasPlayedPrivateServer: {},
-        mostRecentExpansionPlayed: {},
-        prof60: {},
-        profLeveling: {},
-        race: {},
-        region: {},
-        role: {},
-        serverType: {},
-        dailyPlayTime: {},
-        willTakeTimeOffWork: {},
-        hasFoundGuild: {},
-        phaseMostExcitedFor: {}
+        ...answersBlank as any
       }
     });
   }
@@ -455,27 +434,7 @@ export default class Wrapper extends React.Component<Props, State> {
   resetQuestionsShowing() {
     this.setState({
       questionsShowing: {
-        ageRange: true,
-        characterGender: true,
-        class: true,
-        classComparison: true,
-        contentInterest: true,
-        expectedTimeTo60: true,
-        faction: true,
-        firstRetailExpansionPlayed: true,
-        hasActiveSub: true,
-        hasPlayedPrivateServer: true,
-        mostRecentExpansionPlayed: true,
-        prof60: true,
-        profLeveling: true,
-        race: true,
-        region: true,
-        role: true,
-        serverType: true,
-        dailyPlayTime: true,
-        willTakeTimeOffWork: true,
-        hasFoundGuild: true,
-        phaseMostExcitedFor: true
+        ...defaultShowingQuestions
       }
     });
   }
