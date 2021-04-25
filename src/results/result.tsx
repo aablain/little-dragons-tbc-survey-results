@@ -28,6 +28,7 @@ interface State {
   }[];
   countsArr?: [string, number][];
   showOtherAnswers: boolean;
+  showResultDialogue: boolean;
 }
 
 export default class Result extends React.Component<Props, State> {
@@ -43,6 +44,7 @@ export default class Result extends React.Component<Props, State> {
       counts,
       otherCounts,
       showOtherAnswers: false,
+      showResultDialogue: false
       //   countsArr: this._getCountsAssARrayofArrays(props.answerCounts)
     };
 
@@ -52,6 +54,7 @@ export default class Result extends React.Component<Props, State> {
     this.getChartType = this.getChartType.bind(this);
     this.renderBarGraph = this.renderBarGraph.bind(this);
     this.renderPieChart = this.renderPieChart.bind(this);
+    this.toggleResponseModal = this.toggleResponseModal.bind(this)
   }
 
   _getCountsAsArray(answerCounts: {
@@ -287,6 +290,10 @@ export default class Result extends React.Component<Props, State> {
 
     // @ts-ignore
     return <PieChart {...props} />;
+  }
+
+  toggleResponseModal() {
+    this.setState({ showResultDialogue: !this.state.showResultDialogue })
   }
 }
 

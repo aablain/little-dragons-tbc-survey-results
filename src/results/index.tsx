@@ -1,8 +1,12 @@
 import * as React from "react";
+import Modal from "react-modal";
 import Data from "../filters/data";
 import Result from "./result";
+import SurveyResponse from "./surveyResponse";
 import { FilterTypes, Survey } from "../typings";
 import { objectEntries } from "../utils";
+
+Modal.setAppElement("#modal-anchor");
 
 import "./styles.scss";
 import data from "../filters/data";
@@ -15,10 +19,16 @@ interface Props {
   innerHeight: number;
   isColorBlind: boolean;
   questionsShowing: FilterTypes.QuestionsShowing;
+  responsesByPersonName: {
+    [x: string]: any;
+  };
   updateFilterLive: (category: keyof Survey.Response, filter: string) => void;
 }
 
 export default (props: Props) => {
+  const [showResultDialogue, updateShowResultDialogue] = React.useState(false);
+  const [surveyResponse, updateSurveyResponse] = React.useState<any>(undefined);
+
   const filtersLength = !!props.activeFilters ? props.activeFilters.length : 0;
   const characterNames = objectEntries((props.answerCounts as any).character_name).filter(([name, count]) => !!count).map(([name]) => name);
 
@@ -83,11 +93,29 @@ export default (props: Props) => {
         <section className="results-results-people-list-cont">
           <ul className="results-results-people-list">
             {characterNames.map(personName => (
-              <li className="results-results-people-list-name" key={`peoplelist-${personName}`}>{personName}</li>
+              <li className="results-results-people-list-name" key={`peoplelist-${personName}`}>
+                <button className="results-results-people-list-name-btn" onClick={() => {
+                  const response = props.responsesByPersonName[personName];
+
+                  updateSurveyResponse(response);
+                  updateShowResultDialogue(true);
+                }}>
+                  {personName}
+                </button>
+              </li>
             ))}
           </ul>
         </section>
       </div>
+
+      <Modal
+        isOpen={showResultDialogue}
+        onRequestClose={() => updateShowResultDialogue(false)}
+        contentLabel="Survey Response"
+        className="result-survey-response-modal"
+      >
+        <SurveyResponse response={surveyResponse} />
+      </Modal>
     </div>
   );
 };

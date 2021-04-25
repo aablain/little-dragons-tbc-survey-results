@@ -203,8 +203,22 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	font-weight: bold;
-	color: #434343;
 	color: #898989;
+
+	&:hover {
+		color: #434343;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
+.results-results-people-list-name-btn {
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	white-space: inherit;
+	border: none;
+	background-color: transparent;
 }
 
 .result-showother-button {
@@ -218,4 +232,51 @@
 	&:hover {
 		cursor: pointer;
 	}
+}
+
+.ReactModal__Overlay {
+	padding: 20px;
+	box-sizing: border-box;
+	background-color: rgba(0, 0, 0, 0.75) !important;
+	z-index: 1001;
+}
+
+.ReactModal__Content {
+	margin: auto auto;
+	background-color: #fff;
+	box-sizing: border-box;
+	max-height: calc(100vh - 100px);
+	width: 1000px;
+	max-width: 95vw;
+	overflow-y: auto;
+}
+
+.result-person-response {
+	padding: 20px 40px;
+	box-sizing: border-box;
+}
+
+.result-person-response-name {
+	margin: 0px;
+	padding-bottom: 20px;
+	font-size: 32px;
+	color: #434343;
+}
+
+.result-person-response-questions-list {
+	padding: 0px;
+	list-style: none;
+}
+
+.result-person-response-question-item {
+	margin-bottom: 20px;
+}
+
+.result-person-response-question-title {
+	color: #434343;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.result-person-response-question-answer {
 }

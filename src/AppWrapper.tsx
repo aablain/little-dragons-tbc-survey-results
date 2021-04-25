@@ -36,6 +36,9 @@ interface State {
   responses: {
     [x: string]: string | number;
   }[];
+  responsesByPersonName: {
+    [x: string]: any;
+  };
   showFilters: boolean;
 }
 
@@ -100,6 +103,7 @@ export default class Wrapper extends React.Component<Props, State> {
         ...defaultShowingQuestions
       },
       responses: [],
+      responsesByPersonName: [],
       showFilters: window.innerWidth > 480
     };
 
@@ -212,12 +216,22 @@ export default class Wrapper extends React.Component<Props, State> {
 
       // const filteredResps = this._filterResults(responses);
       const filteredResps = responses;
+      const responsesByPersonName = responses.reduce((accum: any, resp: any) => {
+        if (!resp.character_name) {
+          return accum;
+        }
+
+        accum[resp.character_name] = resp;
+
+        return accum;
+      }, {});
 
       const answerCounts: any = this._calcAnswerQuantities(filteredResps);
       this.setState({
         answerCounts,
         computedResponsesLength: filteredResps.length,
         responses: filteredResps as any,
+        responsesByPersonName,
         loaded: true
       });
     });
@@ -312,6 +326,7 @@ export default class Wrapper extends React.Component<Props, State> {
             innerHeight={this.state.innerHeight}
             isColorBlind={this.state.isColorBlind}
             questionsShowing={this.state.questionsShowing as any}
+            responsesByPersonName={this.state.responsesByPersonName}
             updateFilterLive={this.updateFilterLive}
           />
         )}
