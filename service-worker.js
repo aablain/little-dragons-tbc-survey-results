@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/wow-classic-survey-august-2019/precache-manifest.6ebce45abe6764e6daab306870bed567.js"
+  "/little-dragons-tbc-survey-results/precache-manifest.da81098258c60c58c09ddcb9e884f210.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/wow-classic-survey-august-2019/index.html", {
+workbox.routing.registerNavigationRoute("/little-dragons-tbc-survey-results/index.html", {
   
   blacklist: [/^\/_/,/\/[^/]+\.[^/]+$/],
 });
