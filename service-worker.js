@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/little-dragons-tbc-survey-results/precache-manifest.f33b46c8b49d22208d7067f43de94a62.js"
+  "/little-dragons-tbc-survey-results/precache-manifest.57ad4a75749ce0cc39cdc21f5310e991.js"
 );
 
 workbox.clientsClaim();
